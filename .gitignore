@@ -1,0 +1,67 @@
+# -------------------------
+# Python + Virtual Env
+# -------------------------
+*.pyc
+*.pyo
+__pycache__/
+.venv/
+env/
+venv/
+*.egg-info/
+*.egg
+*.pyd
+*.pdb
+
+# -------------------------
+# OS / IDE Specific
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+*.bak
+*.log
+
+# -------------------------
+# Package + Distribution
+# -------------------------
+build/
+dist/
+*.spec
+*.whl
+
+# -------------------------
+# Qt / PyQt5 Artifacts
+# -------------------------
+*.ui.py
+*.qrc.py
+
+# -------------------------
+# Data + Runtime
+# -------------------------
+annotations/
+compiled/
+signal_cache/
+*.parquet
+*.h5
+*.csv
+*.tmp
+
+# -------------------------
+# Local Config / Auth
+# -------------------------
+.annotator_config.json
+config.json
+
+# -------------------------
+# Jupyter / Notebooks
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# PyInstaller Bundles (optional)
+# -------------------------
+__pyinstaller__/
+*.exe
+*.app
