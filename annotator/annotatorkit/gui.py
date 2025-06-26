@@ -221,6 +221,11 @@ class Annotator(QMainWindow):
         response = requests.get(f"{BASE_URL}/get_annotations/{self.annotator_id}/{self.current_signal_id}")
         user_labels = response.json()
 
+        if response.status_code == 200:
+            user_labels = response.json()
+        else:
+            user_labels = []  # No annotations found or error occurred
+
         self.labels = user_labels
 
         if user_labels:
