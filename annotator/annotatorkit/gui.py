@@ -217,9 +217,7 @@ class Annotator(QMainWindow):
     def load_labels(self):
         #Load Label
         response = requests.get(f"{BASE_URL}/get_annotations/{self.annotator_id}/{self.current_signal_id}")
-        print(response)
         user_labels = response.json()
-        print(user_labels)
 
         self.labels = user_labels
 
@@ -329,6 +327,44 @@ class Annotator(QMainWindow):
         elif event.key() == Qt.Key_Up:
             value = min(100, self.slider.value() + 1)
             self.slider.setValue(value)
+        elif event.key() == Qt.Key_0:
+            value = 0
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+        elif event.key() == Qt.Key_1:
+            value = 25
+            self.slider.setValue(value)
+            self.label_segment() 
+            self.next_segment()
+        elif event.key() == Qt.Key_2:
+            value = 42
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+        elif event.key() == Qt.Key_3:
+            value = 59
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+        elif event.key() == Qt.Key_4:
+            value = 76
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+        elif event.key() == Qt.Key_5:
+            value = 93
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+        elif event.key() == Qt.Key_9:
+            value = 100
+            self.slider.setValue(value)
+            self.label_segment()
+            self.next_segment()
+ 
+           
+
 
     def save_labels(self):
         save_path, _ = QFileDialog.getSaveFileName(
