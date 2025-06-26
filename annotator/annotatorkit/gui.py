@@ -132,6 +132,7 @@ class Annotator(QMainWindow):
         save_btn.clicked.connect(self.save_labels)
 
         self.status_label = QLabel("No file loaded")
+        self.labeled = QLabel("No label filel loaded")
 
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
@@ -148,6 +149,7 @@ class Annotator(QMainWindow):
         controls.addWidget(save_btn)
 
         layout.addLayout(controls)
+        layout.addWidget(self.labeled)
         layout.addWidget(self.status_label)
 
         container = QWidget()
@@ -280,17 +282,15 @@ class Annotator(QMainWindow):
             "annotator_id": self.annotator_id
         })
 
-        self.status_label.setText(f"Segment {self.current_index} labeled as {label:.2f}")
-        self.status_label.setStyleSheet("color: green; font-weight: bold")
-        QTimer.singleShot(1000, lambda: self.status_label.setStyleSheet(""))
-
         payload = {
             "annotator_id": self.annotator_id, 
             "signal_id": self.current_signal_id, 
             "annotations": self.labels
         }
         response = requests.post(f"{BASE_URL}/upload_annotations", json=payload)
-
+        self.labeled.setText(f"Segment {self.current_index} labeled as {label:.2f}")
+        self.labeled.setStyleSheet("color: green; font-weight: bold; font-size: 40px")
+        QTimer.singleShot(2000, lambda: self.labeled.setStyleSheet(""))
         self.update_plot()
 
     def next_segment(self):

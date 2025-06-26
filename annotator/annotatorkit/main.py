@@ -1,7 +1,7 @@
 from annotatorkit.gui import run_app
 
 def main():
-    print("running")
+    print("running...")
     run_app()
 
 
