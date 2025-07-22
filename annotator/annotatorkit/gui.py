@@ -278,19 +278,21 @@ class Annotator(QMainWindow):
         # Remove any existing label for this segment
         self.labels = [entry for entry in self.labels if entry['segment_index'] != self.current_index]
 
-        self.labels.append({
+        new_label = {
             "segment_index": self.current_index,
             "start": start,
             "end": end,
             "snorkel_label": label,
             "snorkel_confidence": 1.0, 
             "annotator_id": self.annotator_id
-        })
+        }
 
+        self.labels.append(new_label)
+        
         payload = {
             "annotator_id": self.annotator_id, 
             "signal_id": self.current_signal_id, 
-            "annotations": self.labels
+            "annotations": [new_label]
         }
         response = requests.post(f"{BASE_URL}/upload_annotations", json=payload)
         self.labeled.setText(f"Segment {self.current_index} labeled as {label:.2f}")
