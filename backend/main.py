@@ -44,8 +44,8 @@ def load_signal(signal_id: str, annotator_id: str):
 @app.post("/upload_annotations")
 def upload_annotations(payload: AnnotationUpload):
     try:
-        annot_file = os.path.join(ANNOTATION_DIR, f"{payload.annotator_id}_{payload.signal_id}.parquet")
-        compiled_file = os.path.join(COMPILED_DIR, f"{payload.signal_id}_merged.parquet")
+        annot_file = os.path.join(ANNOTATION_DIR, f"{payload.annotator_id}_{payload.signal_id}.csv")
+        compiled_file = os.path.join(COMPILED_DIR, f"{payload.signal_id}_merged.csv")
         
         new_df = pd.DataFrame(payload.annotations)
         merge_annotations(new_df, annot_file, compiled_file)
@@ -60,10 +60,10 @@ def get_annotations(annotator_id: str, signal_id: str):
     if not is_valid_annotator(annotator_id):
         raise HTTPException(status_code=403, detail="Invalid annotator ID")
         
-    file_path = os.path.join("annotations", f"{annotator_id}_{signal_id}.parquet")
+    file_path = os.path.join("annotations", f"{annotator_id}_{signal_id}.csv")
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Annotation file not found")
-    df = pd.read_parquet(file_path)
+    df = pd.read_csv(file_path)
     return JSONResponse(content=df.to_dict(orient="records"))
 
 @app.get("/validate_annotator/{annotator_id}")

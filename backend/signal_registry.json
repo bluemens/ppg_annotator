@@ -1,9 +1,10 @@
 {
     "signals": [
+      
       {
-        "id": "normalized_signal_compiled_practice_12890",
-        "filename": "normalized_signal_compiled_practice_12890.parquet",
-        "length": 12890
+        "id": "small_set_annotation_set",
+        "filename": "small_set_annotation_set.parquet", 
+        "length": 36000
       }
       
     ]

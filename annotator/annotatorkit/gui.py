@@ -338,27 +338,27 @@ class Annotator(QMainWindow):
             self.label_segment()
             self.next_segment()
         elif event.key() == Qt.Key_1:
-            value = 25
+            value = 17
             self.slider.setValue(value)
             self.label_segment() 
             self.next_segment()
         elif event.key() == Qt.Key_2:
-            value = 42
+            value = 34
             self.slider.setValue(value)
             self.label_segment()
             self.next_segment()
         elif event.key() == Qt.Key_3:
-            value = 59
+            value = 50
             self.slider.setValue(value)
             self.label_segment()
             self.next_segment()
         elif event.key() == Qt.Key_4:
-            value = 76
+            value = 67
             self.slider.setValue(value)
             self.label_segment()
             self.next_segment()
         elif event.key() == Qt.Key_5:
-            value = 93
+            value = 83 
             self.slider.setValue(value)
             self.label_segment()
             self.next_segment()
@@ -371,12 +371,12 @@ class Annotator(QMainWindow):
            
 
 
-    def save_labels(self):
-        save_path, _ = QFileDialog.getSaveFileName(
-            self, "Save Label File", "", "Parquet Files (*.parquet)")
-        if save_path:
-            pd.DataFrame(self.labels).to_parquet(save_path, index=False)
-            self.status_label.setText(f"Saved labels to {save_path}")
+    # def save_labels(self):
+    #     save_path, _ = QFileDialog.getSaveFileName(
+    #         self, "Save Label File", "", "CSV Files (*.csv)")
+    #     if save_path:
+    #         pd.DataFrame(self.labels).to_csv(save_path, index=False)
+    #         self.status_label.setText(f"Saved labels to {save_path}")
 
 def run_app():
     app = QApplication(sys.argv)
