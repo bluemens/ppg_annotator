@@ -6,6 +6,9 @@ import pandas as pd
 import os
 import json
 from utils import merge_annotations, load_registry, is_valid_annotator
+from collections import defaultdict
+import time
+import threading
 
 app = FastAPI()
 
@@ -17,6 +20,22 @@ REGISTRY_FILE = "signal_registry.json"
 os.makedirs(SIGNAL_DIR, exist_ok=True)
 os.makedirs(ANNOTATION_DIR, exist_ok=True)
 os.makedirs(COMPILED_DIR, exist_ok=True)
+
+annotation_buffer = defaultdict(list)  # Keyed by (annotator_id, signal_id)
+SAVE_INTERVAL = 10  # write every 10 annotations
+
+def background_saver():
+    while True:
+        time.sleep(SAVE_INTERVAL)
+        for key, buffer in list(annotation_buffer.items()):
+            if buffer:
+                annotator_id, signal_id = key
+                annot_file = os.path.join(ANNOTATION_DIR, f"{annotator_id}_{signal_id}.csv")
+                compiled_file = os.path.join(COMPILED_DIR, f"{signal_id}_merged.csv")
+                new_df = pd.DataFrame(buffer)
+                merge_annotations(new_df, annot_file, compiled_file)
+                annotation_buffer[key].clear()
+                print(f"Saved {len(new_df)} annotations for {key}")
 
 class AnnotationUpload(BaseModel):
     annotator_id: str
@@ -44,16 +63,30 @@ def load_signal(signal_id: str, annotator_id: str):
 @app.post("/upload_annotations")
 def upload_annotations(payload: AnnotationUpload):
     try:
-        annot_file = os.path.join(ANNOTATION_DIR, f"{payload.annotator_id}_{payload.signal_id}.csv")
-        compiled_file = os.path.join(COMPILED_DIR, f"{payload.signal_id}_merged.csv")
-        
-        new_df = pd.DataFrame(payload.annotations)
-        merge_annotations(new_df, annot_file, compiled_file)
-
-        return {"status": "success", "annotator": payload.annotator_id, "signal": payload.signal_id}
+        key = (payload.annotator_id, payload.signal_id)
+        annotation_buffer[key].extend(payload.annotations)
+        return {"status": "buffered", "buffer_length": len(annotation_buffer[key])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
     
+@app.post("/flush_annotations")
+def flush_annotations(payload: AnnotationUpload):
+    try:
+        key = (payload.annotator_id, payload.signal_id)
+        buffer_data = annotation_buffer.pop(key, [])
+
+        if not buffer_data:
+            return {"status": "nothing to flush"}
+
+        annot_file = os.path.join(ANNOTATION_DIR, f"{payload.annotator_id}_{payload.signal_id}.csv")
+        compiled_file = os.path.join(COMPILED_DIR, f"{payload.signal_id}_merged.csv")
+        new_df = pd.DataFrame(buffer_data)
+        merge_annotations(new_df, annot_file, compiled_file)
+
+        return {"status": "flushed", "count": len(buffer_data)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/get_annotations/{annotator_id}/{signal_id}")
 def get_annotations(annotator_id: str, signal_id: str):
@@ -71,3 +104,9 @@ def validate_annotator(annotator_id: str):
     if not is_valid_annotator(annotator_id):
         raise HTTPException(status_code=403, detail="Invalid annotator ID")
     return {"status": "ok"}
+
+
+
+@app.on_event("startup")
+def start_background_saver():
+    threading.Thread(target=background_saver, daemon=True).start()
