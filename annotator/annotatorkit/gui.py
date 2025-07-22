@@ -288,7 +288,7 @@ class Annotator(QMainWindow):
         }
 
         self.labels.append(new_label)
-        
+
         payload = {
             "annotator_id": self.annotator_id, 
             "signal_id": self.current_signal_id, 
@@ -370,7 +370,18 @@ class Annotator(QMainWindow):
             self.label_segment()
             self.next_segment()
  
-           
+    def flush_annotations_on_exit(self):
+        try:
+            payload = {
+                "annotator_id": self.annotator_id,
+                "signal_id": self.current_signal_id,
+                "annotations": []  # empty; just triggers server flush
+            }
+            response = requests.post(f"{BASE_URL}/flush_annotations", json=payload)
+            print("Flushed:", response.json())
+        except Exception as e:
+            print("Failed to flush annotations on exit:", e)
+    
 
 
     # def save_labels(self):
@@ -384,4 +395,5 @@ def run_app():
     app = QApplication(sys.argv)
     window = Annotator()
     window.show()
+    app.aboutToQuit.connect(window.flush_annotations_on_exit)
     sys.exit(app.exec_())
