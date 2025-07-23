@@ -128,9 +128,6 @@ class Annotator(QMainWindow):
         prev_btn = QPushButton("Previous")
         prev_btn.clicked.connect(self.prev_segment)
 
-        save_btn = QPushButton("Save Labels")
-        save_btn.clicked.connect(self.save_labels)
-
         self.status_label = QLabel("No file loaded")
         self.labeled = QLabel("No label filel loaded")
 
@@ -146,7 +143,6 @@ class Annotator(QMainWindow):
         controls.addWidget(self.slider_label)
         controls.addWidget(self.slider)
         controls.addWidget(label_btn)
-        controls.addWidget(save_btn)
 
         layout.addLayout(controls)
         layout.addWidget(self.labeled)
@@ -295,6 +291,7 @@ class Annotator(QMainWindow):
             "annotations": [new_label]
         }
         response = requests.post(f"{BASE_URL}/upload_annotations", json=payload)
+        print("Sending annotation:", payload)
         self.labeled.setText(f"Segment {self.current_index} labeled as {label:.2f}")
         self.labeled.setStyleSheet("color: green; font-weight: bold; font-size: 40px")
         QTimer.singleShot(2000, lambda: self.labeled.setStyleSheet(""))

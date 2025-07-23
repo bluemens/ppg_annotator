@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ppg-annotator",
-    version="0.1.2",
+    version="0.1.4",
     packages=find_packages(),
     install_requires=[
         "PyQt5",
