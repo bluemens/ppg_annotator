@@ -26,7 +26,7 @@ os.makedirs(ANNOTATION_DIR, exist_ok=True)
 os.makedirs(COMPILED_DIR, exist_ok=True)
 
 annotation_buffer = defaultdict(list)  # Keyed by (annotator_id, signal_id)
-SAVE_INTERVAL = 10  # write every 10 annotations
+SAVE_INTERVAL = 30  # write every 30 Seconds
 
 def background_saver():
     while True:
@@ -34,6 +34,7 @@ def background_saver():
         with buffer_lock:
             for key, buffer in list(annotation_buffer.items()):
                 if buffer:
+                    print(f"[Saver] Saving {len(buffer)} for {key}")
                     annotator_id, signal_id = key
                     annot_file = os.path.join(ANNOTATION_DIR, f"{annotator_id}_{signal_id}.csv")
                     compiled_file = os.path.join(COMPILED_DIR, f"{signal_id}_merged.csv")
@@ -41,6 +42,7 @@ def background_saver():
                     merge_annotations(new_df, annot_file, compiled_file)
                     annotation_buffer[key].clear()
                     print(f"Saved {len(new_df)} annotations for {key}")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -81,7 +83,6 @@ def upload_annotations(payload: AnnotationUpload):
         key = (payload.annotator_id, payload.signal_id)
         with buffer_lock:
             annotation_buffer[key].extend(payload.annotations)
-            print(f"[Buffered] now has {len(annotation_buffer[key])} items")
         return {"status": "buffered", "buffer_length": len(annotation_buffer[key])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
